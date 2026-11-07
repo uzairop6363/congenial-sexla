@@ -79,10 +79,12 @@ body {
 
 <div id="loader">
   <h2>Loading Game...</h2>
+
   <div class="progress">
     <div id="progressBar"></div>
   </div>
-  <p id="loadingText">Loading images: 0/4</p>
+
+  <p id="loadingText">Loading images: 0/8</p>
 </div>
 
 <main id="game" class="hidden">
@@ -91,11 +93,17 @@ body {
 </main>
 
 <script>
+
+// ALL 8 IMAGES
 const imagePaths = [
   "images/1.png",
   "images/2.png",
   "images/3.png",
-  "images/4.png"
+  "images/4.png",
+  "images/5.png",
+  "images/6.png",
+  "images/7.png",
+  "images/8.png"
 ];
 
 const scene = document.getElementById("scene");
@@ -106,105 +114,164 @@ const loadingText = document.getElementById("loadingText");
 const tapArea = document.getElementById("tapArea");
 
 let images = [];
-let currentFrame = 0;
 let isAnimating = false;
 
 const FRAME_DELAY = 130;
 
+// RANDOM HOLD AT IMAGE 4
+const MIN_HOLD = 150;
+const MAX_HOLD = 450;
+
 // PRELOAD ALL IMAGES
 async function preloadImages() {
+
   let completed = 0;
 
   try {
+
     images = await Promise.all(
       imagePaths.map(path => {
+
         return new Promise((resolve, reject) => {
+
           const img = new Image();
 
           img.onload = () => {
+
             completed++;
+
             progressBar.style.width =
-              (completed / imagePaths.length * 100) + "%";
+              (completed / 8 * 100) + "%";
 
             loadingText.textContent =
-              `Loading images: ${completed}/4`;
+              `Loading images: ${completed}/8`;
 
             resolve(img);
           };
 
           img.onerror = () => {
-            reject(new Error("Failed: " + path));
+            reject(new Error("Failed to load: " + path));
           };
 
           img.src = path;
+
         });
+
       })
     );
 
-    // FIRST IMAGE
+    // INITIAL READY IMAGE
     scene.src = images[0].src;
 
     loadingText.textContent = "Game Ready!";
 
-    // OPEN GAME AFTER ALL IMAGES LOAD
     setTimeout(() => {
       loader.classList.add("hidden");
       game.classList.remove("hidden");
     }, 300);
 
   } catch (error) {
+
     loadingText.textContent =
       "Loading failed! Check image files and refresh.";
+
     console.error(error);
+
   }
 }
 
-// ANIMATION: IMAGE 1 → 2 → 3 → 4
+
+// SHOW IMAGE
+function showFrame(index) {
+  scene.src = images[index].src;
+}
+
+
+// COMPLETE ANIMATION
 function playAnimation() {
+
   if (isAnimating) return;
 
   isAnimating = true;
 
   let frame = 0;
 
-  function nextFrame() {
-    scene.src = images[frame].src;
+  // PLAY FRAMES 1 TO 4
+  function playInside() {
+
+    showFrame(frame);
 
     if (frame < 3) {
+
       frame++;
-      setTimeout(nextFrame, FRAME_DELAY);
+
+      setTimeout(playInside, FRAME_DELAY);
+
     } else {
-      currentFrame = 3;
-      isAnimating = false;
+
+      // IMAGE 4 HOLD RANDOMLY
+      const randomHold =
+        Math.floor(
+          Math.random() * (MAX_HOLD - MIN_HOLD + 1)
+        ) + MIN_HOLD;
+
+      setTimeout(() => {
+
+        // PLAY FRAMES 5 TO 8 AUTOMATICALLY
+        let returnFrame = 4;
+
+        function playOutside() {
+
+          showFrame(returnFrame);
+
+          if (returnFrame < 7) {
+
+            returnFrame++;
+
+            setTimeout(playOutside, FRAME_DELAY);
+
+          } else {
+
+            // BACK TO READY IMAGE
+            setTimeout(() => {
+
+              showFrame(0);
+
+              isAnimating = false;
+
+            }, FRAME_DELAY);
+
+          }
+
+        }
+
+        playOutside();
+
+      }, randomHold);
+
     }
+
   }
 
-  nextFrame();
+  playInside();
+
 }
 
-// TAP CONTROLS
+
+// USER TAP
 tapArea.addEventListener("click", () => {
 
   if (isAnimating) return;
 
-  if (currentFrame === 3) {
-
-    // IMAGE 4 → IMAGE 1
-    currentFrame = 0;
-    scene.src = images[0].src;
-
-  } else {
-
-    // IMAGE 1 → IMAGE 2 → IMAGE 3 → IMAGE 4
-    playAnimation();
-
-  }
+  playAnimation();
 
 });
 
-// START
+
+// START GAME
 preloadImages();
 
 </script>
+
 </body>
 </html>
