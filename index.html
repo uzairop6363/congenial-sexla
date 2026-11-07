@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tap Animation Game</title>
+<title>V9 UZAIR - Animation Game</title>
 
 <style>
 * {
@@ -14,10 +14,106 @@
 }
 
 body {
-  background: #111;
-  overflow: hidden;
+  background: #10131c;
+  color: white;
   font-family: Arial, sans-serif;
+  overflow: hidden;
   user-select: none;
+}
+
+.page {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 28px;
+  text-align: center;
+  gap: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.logo {
+  font-size: 13px;
+  letter-spacing: 5px;
+  color: #65d6bc;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 32px;
+  letter-spacing: 2px;
+}
+
+.description {
+  color: #aab1c1;
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 330px;
+}
+
+.random-text {
+  color: #78859b;
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 40px;
+}
+
+button {
+  width: 100%;
+  max-width: 320px;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #19a77e;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+.card {
+  width: 100%;
+  max-width: 350px;
+  padding: 25px;
+  border: 1px solid #30394a;
+  background: #191f2d;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #39475b;
+  border-radius: 9px;
+  outline: none;
+  background: #101722;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+}
+
+input:focus {
+  border-color: #19a77e;
+}
+
+#error {
+  color: #ff7777;
+  font-size: 12px;
+  min-height: 15px;
 }
 
 #loader {
@@ -26,7 +122,6 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
   gap: 18px;
 }
 
@@ -42,7 +137,7 @@ body {
 #progressBar {
   width: 0%;
   height: 100%;
-  background: #16c784;
+  background: #19c98b;
   transition: width .2s;
 }
 
@@ -68,16 +163,116 @@ body {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-
-.hidden {
-  display: none !important;
-}
 </style>
 </head>
 
 <body>
 
-<div id="loader">
+<!-- PAGE 1: WELCOME -->
+
+<section id="welcome" class="page">
+
+  <div class="logo">V9 UZAIR</div>
+
+  <h1>WELCOME</h1>
+
+  <p class="description">
+    Welcome to your interactive experience.
+    Get ready for something interesting.
+  </p>
+
+  <div class="random-text" id="welcomeText"></div>
+
+  <button onclick="showDisclaimer()">
+    NEXT →
+  </button>
+
+  <p class="random-text">VERSION 1.0</p>
+
+</section>
+
+
+<!-- PAGE 2: DISCLAIMER -->
+
+<section id="disclaimer" class="page hidden">
+
+  <div class="logo">IMPORTANT INFORMATION</div>
+
+  <div class="card">
+
+    <h1 style="font-size:25px">DISCLAIMER</h1>
+
+    <p class="description">
+      This application is an interactive image animation
+      experience.
+
+      Please make sure you understand the basic controls
+      before starting.
+
+      Your images are loaded in your browser to make
+      animation smoother.
+    </p>
+
+    <p class="random-text">
+      Enjoy the experience and use the screen tap
+      to control the animation.
+    </p>
+
+    <button onclick="showKeyPage()">
+      START →
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- PAGE 3: KEY VERIFICATION -->
+
+<section id="keyPage" class="page hidden">
+
+  <div class="logo">V9 UZAIR ACCESS</div>
+
+  <div class="card">
+
+    <h1 style="font-size:25px">ENTER YOUR KEY</h1>
+
+    <p class="description">
+      Enter your access key below to unlock
+      the animation experience.
+    </p>
+
+    <p class="random-text">
+      Access is required to continue.
+      Make sure your key is correct.
+    </p>
+
+    <input
+      type="password"
+      id="keyInput"
+      placeholder="Enter your key..."
+      autocomplete="off"
+    >
+
+    <p id="error"></p>
+
+    <button onclick="verifyKey()">
+      CONTINUE →
+    </button>
+
+  </div>
+
+  <p class="random-text">
+    SECURE ACCESS SYSTEM
+  </p>
+
+</section>
+
+
+<!-- PAGE 4: IMAGE LOADER -->
+
+<section id="loader" class="hidden">
+
   <h2>Loading Game...</h2>
 
   <div class="progress">
@@ -85,16 +280,87 @@ body {
   </div>
 
   <p id="loadingText">Loading images: 0/8</p>
-</div>
+
+  <p class="random-text">
+    Preparing your experience...
+  </p>
+
+</section>
+
+
+<!-- PAGE 5: GAME -->
 
 <main id="game" class="hidden">
+
   <img id="scene" src="" draggable="false">
+
   <div id="tapArea"></div>
+
 </main>
+
 
 <script>
 
-// ALL 8 IMAGES
+// RANDOM WELCOME TEXTS
+
+const welcomeTexts = [
+  "Every experience begins somewhere.",
+  "Something interesting is waiting ahead.",
+  "Take your time and enjoy the journey.",
+  "A new interactive experience awaits.",
+  "Ready to explore something different?",
+  "Your next adventure starts here."
+];
+
+document.getElementById("welcomeText").textContent =
+  welcomeTexts[Math.floor(Math.random() * welcomeTexts.length)];
+
+
+// PAGE NAVIGATION
+
+function showDisclaimer() {
+
+  document.getElementById("welcome").classList.add("hidden");
+
+  document.getElementById("disclaimer").classList.remove("hidden");
+
+}
+
+function showKeyPage() {
+
+  document.getElementById("disclaimer").classList.add("hidden");
+
+  document.getElementById("keyPage").classList.remove("hidden");
+
+}
+
+
+// KEY VERIFICATION
+
+function verifyKey() {
+
+  const input = document.getElementById("keyInput").value;
+  const error = document.getElementById("error");
+
+  if (input === "v9uzair") {
+
+    document.getElementById("keyPage").classList.add("hidden");
+
+    document.getElementById("loader").classList.remove("hidden");
+
+    preloadImages();
+
+  } else {
+
+    error.textContent = "Incorrect key! Please try again.";
+
+  }
+
+}
+
+
+// IMAGE FILES
+
 const imagePaths = [
   "images/1.png",
   "images/2.png",
@@ -118,11 +384,12 @@ let isAnimating = false;
 
 const FRAME_DELAY = 130;
 
-// RANDOM HOLD AT IMAGE 4
 const MIN_HOLD = 150;
 const MAX_HOLD = 450;
 
+
 // PRELOAD ALL IMAGES
+
 async function preloadImages() {
 
   let completed = 0;
@@ -130,6 +397,7 @@ async function preloadImages() {
   try {
 
     images = await Promise.all(
+
       imagePaths.map(path => {
 
         return new Promise((resolve, reject) => {
@@ -147,10 +415,13 @@ async function preloadImages() {
               `Loading images: ${completed}/8`;
 
             resolve(img);
+
           };
 
           img.onerror = () => {
-            reject(new Error("Failed to load: " + path));
+
+            reject(new Error("Failed: " + path));
+
           };
 
           img.src = path;
@@ -158,19 +429,26 @@ async function preloadImages() {
         });
 
       })
+
     );
 
-    // INITIAL READY IMAGE
+    // INITIAL IMAGE
+
     scene.src = images[0].src;
 
     loadingText.textContent = "Game Ready!";
 
     setTimeout(() => {
+
       loader.classList.add("hidden");
+
       game.classList.remove("hidden");
+
     }, 300);
 
-  } catch (error) {
+  }
+
+  catch(error) {
 
     loadingText.textContent =
       "Loading failed! Check image files and refresh.";
@@ -178,16 +456,21 @@ async function preloadImages() {
     console.error(error);
 
   }
+
 }
 
 
 // SHOW IMAGE
+
 function showFrame(index) {
+
   scene.src = images[index].src;
+
 }
 
 
 // COMPLETE ANIMATION
+
 function playAnimation() {
 
   if (isAnimating) return;
@@ -196,7 +479,9 @@ function playAnimation() {
 
   let frame = 0;
 
-  // PLAY FRAMES 1 TO 4
+
+  // IMAGE 1 TO 4: BALL GOES INSIDE
+
   function playInside() {
 
     showFrame(frame);
@@ -207,9 +492,12 @@ function playAnimation() {
 
       setTimeout(playInside, FRAME_DELAY);
 
-    } else {
+    }
 
-      // IMAGE 4 HOLD RANDOMLY
+    else {
+
+      // RANDOM HOLD AT IMAGE 4
+
       const randomHold =
         Math.floor(
           Math.random() * (MAX_HOLD - MIN_HOLD + 1)
@@ -217,7 +505,8 @@ function playAnimation() {
 
       setTimeout(() => {
 
-        // PLAY FRAMES 5 TO 8 AUTOMATICALLY
+        // IMAGE 5 TO 8: BALL RETURNS
+
         let returnFrame = 4;
 
         function playOutside() {
@@ -230,9 +519,12 @@ function playAnimation() {
 
             setTimeout(playOutside, FRAME_DELAY);
 
-          } else {
+          }
 
-            // BACK TO READY IMAGE
+          else {
+
+            // RETURN TO READY IMAGE
+
             setTimeout(() => {
 
               showFrame(0);
@@ -258,7 +550,8 @@ function playAnimation() {
 }
 
 
-// USER TAP
+// TAP CONTROL
+
 tapArea.addEventListener("click", () => {
 
   if (isAnimating) return;
@@ -266,10 +559,6 @@ tapArea.addEventListener("click", () => {
   playAnimation();
 
 });
-
-
-// START GAME
-preloadImages();
 
 </script>
 
